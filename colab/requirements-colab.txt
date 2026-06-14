@@ -5,9 +5,10 @@
 #     pip install -r colab/requirements-colab.txt
 #
 # 方針:
-# - Colab は torch / torchvision / numpy / pillow / opencv / scipy を
-#   プリインストール済み。これらは入れない（入れると Colab の CUDA 版
-#   torch が壊れる）。
+# - Colab は torch / torchvision / numpy / opencv / scipy をプリインストール済み。
+#   これらは入れない（入れると Colab の CUDA 版 torch が壊れる）。
+# - ただし Pillow だけは例外。Colab 同梱の 12.x は private 型 `_Ink` を削除しており、
+#   transformers 4.49.0 の CLIP 画像プロセッサ import が失敗する → 11 系に固定する。
 # - gfpgan / basicsr / realesrgan は入れない。upscale.py は自前 RRDBNet 実装、
 #   face_restore.py は facexlib のみ使用するため不要。さらに basicsr は
 #   新しい torchvision で import 自体が壊れる地雷。
@@ -21,6 +22,7 @@
 diffusers==0.36.0
 transformers==4.49.0
 gradio==6.2.0
+pillow>=11,<12        # Colab 同梱の Pillow 12 は _Ink 削除で transformers と非互換
 
 # --- 補助（バージョンは pip に解決させる） ---
 accelerate
