@@ -1,0 +1,39 @@
+# ============================================================
+# Google Colab 用 依存関係（画像生成のみ / image-only）
+# ============================================================
+# 使い方（ノートブックの「依存インストール」セルで実行）:
+#     pip install -r colab/requirements-colab.txt
+#
+# 方針:
+# - Colab は torch / torchvision / numpy / pillow / opencv / scipy を
+#   プリインストール済み。これらは入れない（入れると Colab の CUDA 版
+#   torch が壊れる）。
+# - gfpgan / basicsr / realesrgan は入れない。upscale.py は自前 RRDBNet 実装、
+#   face_restore.py は facexlib のみ使用するため不要。さらに basicsr は
+#   新しい torchvision で import 自体が壊れる地雷。
+# - anthropic / clip-interrogator は「プロンプト支援(Claude API)」用なので
+#   画像のみ構成では不要（必要なら別途 pip install anthropic clip-interrogator）。
+# - 動画 / 音声の依存（diffusers動画系/imageio/TTS/audiocraft/fairseq 等）は
+#   画像のみ構成では入れない。
+# ============================================================
+
+# --- コア（バージョン固定: 実機で検証済みの組合せ） ---
+diffusers==0.36.0
+transformers==4.49.0
+gradio==6.2.0
+
+# --- 補助（バージョンは pip に解決させる） ---
+accelerate
+safetensors
+peft
+huggingface-hub
+
+# --- 画像系機能の依存 ---
+controlnet-aux        # ControlNet 前処理（openpose/canny/depth/lineart 等）
+rembg                 # 背景除去
+facexlib              # Face Restore の顔検出・整列
+
+# --- ユーティリティ ---
+omegaconf
+einops
+python-dotenv
