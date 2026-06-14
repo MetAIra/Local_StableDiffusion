@@ -1,4 +1,6 @@
 """パイプライン管理モジュール"""
+import os
+
 import torch
 from diffusers import (
     StableDiffusionImg2ImgPipeline,
@@ -92,10 +94,15 @@ class PipelineManager:
         if model_path is None:
             raise ValueError(f"Model not found: {model_name}")
 
-        # VAEのロード
+        # VAEのロード（指定があり、かつファイルが存在する場合のみ。
+        # 無ければモデル内蔵のVAEを使う＝VAEファイルを持たない利用者でも動く）
         vae = None
-        if VAE_FILES[vae_name] is not None:
-            vae = AutoencoderKL.from_single_file(VAE_FILES[vae_name])
+        vae_path = VAE_FILES.get(vae_name)
+        if vae_path:
+            if os.path.exists(vae_path):
+                vae = AutoencoderKL.from_single_file(vae_path)
+            else:
+                print(f"Warning: VAE file not found, using model's built-in VAE: {vae_path}")
 
         # スケジューラを作成
         scheduler = self.get_scheduler(scheduler_name)

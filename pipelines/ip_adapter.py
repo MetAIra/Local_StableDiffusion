@@ -114,13 +114,16 @@ class IPAdapterPipelineManager:
             del self.pipe
             self.clear_cache()
 
-        # VAEのロード
+        # VAEのロード（ファイルが存在する場合のみ。無ければモデル内蔵VAEを使用）
         vae = None
-        if VAE_FILES.get(vae_name) is not None:
+        vae_path = VAE_FILES.get(vae_name)
+        if vae_path and os.path.exists(vae_path):
             vae = AutoencoderKL.from_single_file(
-                VAE_FILES[vae_name],
+                vae_path,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
             )
+        elif vae_path:
+            print(f"Warning: VAE file not found, using model's built-in VAE: {vae_path}")
 
         # スケジューラを作成
         scheduler = self.get_scheduler(scheduler_name)

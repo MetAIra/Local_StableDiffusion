@@ -128,13 +128,16 @@ class ControlNetPipelineManager:
         # ControlNetモデルをロード（モデルタイプに応じたControlNetを使用）
         controlnet = self._load_controlnet_model(controlnet_type, model_type)
 
-        # VAEのロード
+        # VAEのロード（ファイルが存在する場合のみ。無ければモデル内蔵VAEを使用）
         vae = None
-        if VAE_FILES[vae_name] is not None:
+        vae_path = VAE_FILES.get(vae_name)
+        if vae_path and os.path.exists(vae_path):
             vae = AutoencoderKL.from_single_file(
-                VAE_FILES[vae_name],
+                vae_path,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
             )
+        elif vae_path:
+            print(f"Warning: VAE file not found, using model's built-in VAE: {vae_path}")
 
         # スケジューラを作成
         scheduler = self.get_scheduler(scheduler_name)
@@ -239,13 +242,16 @@ class ControlNetPipelineManager:
             controlnet = self._load_controlnet_model(cn_type, model_type)
             controlnets.append(controlnet)
 
-        # VAEのロード
+        # VAEのロード（ファイルが存在する場合のみ。無ければモデル内蔵VAEを使用）
         vae = None
-        if VAE_FILES[vae_name] is not None:
+        vae_path = VAE_FILES.get(vae_name)
+        if vae_path and os.path.exists(vae_path):
             vae = AutoencoderKL.from_single_file(
-                VAE_FILES[vae_name],
+                vae_path,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
             )
+        elif vae_path:
+            print(f"Warning: VAE file not found, using model's built-in VAE: {vae_path}")
 
         # スケジューラを作成
         scheduler = self.get_scheduler(scheduler_name)
